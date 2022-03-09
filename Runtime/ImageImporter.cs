@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Unity.Burst;
@@ -38,7 +38,7 @@ public static partial class AsyncImageLoader {
 
     JobHandle _finalJob;
 
-    public ImageImporter(byte[] imageData, LoaderSettings loaderSettings) {
+    public ImageImporter(IntPtr data, uint length, LoaderSettings loaderSettings) {
       using (ConstructorMarker.Auto()) {
         _loaderSettings = loaderSettings;
         _bitmap = IntPtr.Zero;
@@ -46,13 +46,10 @@ public static partial class AsyncImageLoader {
         IntPtr memoryStream = IntPtr.Zero;
 
         try {
-          memoryStream = FreeImage.OpenMemory(
-            Marshal.UnsafeAddrOfPinnedArrayElement(imageData, 0),
-            (uint)imageData.Length
-          );
+          memoryStream = FreeImage.OpenMemory(data, length);
 
           if (_loaderSettings.format == FreeImage.Format.FIF_UNKNOWN) {
-            _loaderSettings.format = FreeImage.GetFileTypeFromMemory(memoryStream, imageData.Length);
+            _loaderSettings.format = FreeImage.GetFileTypeFromMemory(memoryStream, (int)length);
           }
 
           if (_loaderSettings.format == FreeImage.Format.FIF_UNKNOWN) {
