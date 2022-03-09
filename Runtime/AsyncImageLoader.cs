@@ -1,28 +1,29 @@
+using System;
 using System.Threading.Tasks;
 using UnityEngine;
 
 public static partial class AsyncImageLoader {
   /// <summary> Load image synchronously. This variant uses the default <c>LoaderSettings</c>.</summary>
   /// <returns>True if the data can be loaded, false otherwise.</returns>
-  public static bool LoadImage(Texture2D texture, byte[] data) {
-    return LoadImage(texture, data, LoaderSettings.Default);
+  public static bool LoadImage(Texture2D texture, IntPtr data, uint length) {
+    return LoadImage(texture, data, length, LoaderSettings.Default);
   }
 
   /// <summary> Load image synchronously. This variant is similar to <c>ImageConversion.LoadImage</c>.</summary>
   /// <returns>True if the data can be loaded, false otherwise.</returns>
-  public static bool LoadImage(Texture2D texture, byte[] data, bool markNonReadable) {
+  public static bool LoadImage(Texture2D texture, IntPtr data, uint length, bool markNonReadable) {
     var loaderSettings = LoaderSettings.Default;
     loaderSettings.markNonReadable = markNonReadable;
-    return LoadImage(texture, data, loaderSettings);
+    return LoadImage(texture, data, length, loaderSettings);
   }
 
   /// <summary> Load image synchronously. This variant accepts a <c>LoaderSettings</c>. Useful for debugging and profiling.</summary>
   /// <returns>True if the data can be loaded, false otherwise.</returns>
-  public static bool LoadImage(Texture2D texture, byte[] data, LoaderSettings loaderSettings) {
+  public static bool LoadImage(Texture2D texture, IntPtr data, uint length, LoaderSettings loaderSettings) {
     try {
-      if (data == null || data.Length == 0) throw new System.Exception("Input data is null or empty.");
+      if (data == null || length == 0) throw new System.Exception("Input data is null or empty.");
 
-      using (var importer = new ImageImporter(data, loaderSettings)) {
+      using (var importer = new ImageImporter(data, length, loaderSettings)) {
         importer.LoadIntoTexture(texture);
       }
 
@@ -36,25 +37,25 @@ public static partial class AsyncImageLoader {
 
   /// <summary> Load image asynchronously. This variant uses the default <c>LoaderSettings</c>.</summary>
   /// <returns>True if the data can be loaded, false otherwise.</returns>
-  public static Task<bool> LoadImageAsync(Texture2D texture, byte[] data) {
-    return LoadImageAsync(texture, data, LoaderSettings.Default);
+  public static Task<bool> LoadImageAsync(Texture2D texture, IntPtr data, uint length) {
+    return LoadImageAsync(texture, data, length, LoaderSettings.Default);
   }
 
   /// <summary> Load image asynchronously. This variant is similar to <c>ImageConversion.LoadImage</c>.</summary>
   /// <returns>True if the data can be loaded, false otherwise.</returns>
-  public static Task<bool> LoadImageAsync(Texture2D texture, byte[] data, bool markNonReadable) {
+  public static Task<bool> LoadImageAsync(Texture2D texture, IntPtr data, uint length, bool markNonReadable) {
     var loaderSettings = LoaderSettings.Default;
     loaderSettings.markNonReadable = markNonReadable;
-    return LoadImageAsync(texture, data, loaderSettings);
+    return LoadImageAsync(texture, data, length, loaderSettings);
   }
 
   /// <summary>Load image asynchronously. This variant accepts a <c>LoaderSettings</c>.</summary>
   /// <returns>True if the data can be loaded, false otherwise.</returns>
-  public static async Task<bool> LoadImageAsync(Texture2D texture, byte[] data, LoaderSettings loaderSettings) {
+  public static async Task<bool> LoadImageAsync(Texture2D texture, IntPtr data, uint length, LoaderSettings loaderSettings) {
     try {
-      if (data == null || data.Length == 0) throw new System.Exception("Input data is null or empty.");
+      if (data == null || length == 0) throw new System.Exception("Input data is null or empty.");
 
-      using (var importer = await Task.Run(() => new ImageImporter(data, loaderSettings))) {
+      using (var importer = await Task.Run(() => new ImageImporter(data, length, loaderSettings))) {
         await importer.LoadIntoTextureAsync(texture);
       }
 
@@ -68,18 +69,18 @@ public static partial class AsyncImageLoader {
 
   /// <summary>Create <c>Texture2D</c> from image data synchronously. This variant uses a default <c>LoaderSettings</c>. Linear and mipmap count can be specified.</summary>
   /// <returns><c>Texture2D</c> object if the data can be loaded, null otherwise.</returns>
-  public static Texture2D CreateFromImage(byte[] data) {
-    return CreateFromImage(data, LoaderSettings.Default);
+  public static Texture2D CreateFromImage(IntPtr data, uint length) {
+    return CreateFromImage(data, length, LoaderSettings.Default);
   }
 
 
   /// <summary>Create <c>Texture2D</c> from image data synchronously. This variant accepts a <c>LoaderSettings</c>. Linear and mipmap count can be specified.</summary>
   /// <returns><c>Texture2D</c> object if the data can be loaded, null otherwise.</returns>
-  public static Texture2D CreateFromImage(byte[] data, LoaderSettings loaderSettings) {
+  public static Texture2D CreateFromImage(IntPtr data, uint length, LoaderSettings loaderSettings) {
     try {
-      if (data == null || data.Length == 0) throw new System.Exception("Input data is null or empty.");
+      if (data == null || length == 0) throw new System.Exception("Input data is null or empty.");
 
-      using (var importer = new ImageImporter(data, loaderSettings)) {
+      using (var importer = new ImageImporter(data, length, loaderSettings)) {
         return importer.CreateNewTexture();
       }
     } catch (System.Exception e) {
@@ -91,17 +92,17 @@ public static partial class AsyncImageLoader {
 
   /// <summary>Create <c>Texture2D</c> from image data asynchronously. This variant uses a default <c>LoaderSettings</c>. Linear and mipmap count can be specified.</summary>
   /// <returns><c>Texture2D</c> object if the data can be loaded, null otherwise.</returns>
-  public static Task<Texture2D> CreateFromImageAsync(byte[] data) {
-    return CreateFromImageAsync(data, LoaderSettings.Default);
+  public static Task<Texture2D> CreateFromImageAsync(IntPtr data, uint length) {
+    return CreateFromImageAsync(data, length, LoaderSettings.Default);
   }
 
   /// <summary>Create <c>Texture2D</c> from image data asynchronously. This variant accepts a <c>LoaderSettings</c>. Linear and mipmap count can be specified.</summary>
   /// <returns><c>Texture2D</c> object if the data can be loaded, null otherwise.</returns>
-  public static async Task<Texture2D> CreateFromImageAsync(byte[] data, LoaderSettings loaderSettings) {
+  public static async Task<Texture2D> CreateFromImageAsync(IntPtr data, uint length, LoaderSettings loaderSettings) {
     try {
-      if (data == null || data.Length == 0) throw new System.Exception("Input data is null or empty.");
+      if (data == null || length == 0) throw new System.Exception("Input data is null or empty.");
 
-      using (var importer = await Task.Run(() => new ImageImporter(data, loaderSettings))) {
+      using (var importer = await Task.Run(() => new ImageImporter(data, length, loaderSettings))) {
         return await importer.CreateNewTextureAsync();
       }
     } catch (System.Exception e) {
